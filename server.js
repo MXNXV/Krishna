@@ -75,7 +75,7 @@ KRISHNA'S RESPONSE:
     });
   } catch (err) {
     console.error('LLM error:', err.message);
-    res.status(500).json({ error: 'Krishna is silent right now.' });
+    res.status(500).json({ error: 'Krishna is sleeping right now.' });
   }
 });
 

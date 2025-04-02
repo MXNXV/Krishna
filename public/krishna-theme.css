@@ -1,7 +1,8 @@
 /* Krishna Chatbot - Vrindavan Theme CSS Additions */
 
+/* ------------------ */
 /* Typing dots animation */
-/* Krishna Typing Indicator Dots */
+/* ------------------ */
 .dot-animation::after {
   content: '...';
   animation: blink 1.2s steps(3, jump-none) infinite;
@@ -14,14 +15,98 @@
   100% { content: '...'; }
 }
 
-
-/* Optional bubble styles if not already in your main CSS */
-.krishna-bubble {
-  background: linear-gradient(to right, #6b46c1, #9f7aea);
-  color: white;
+/* ------------------ */
+/* Divine Fonts & Heading */
+/* ------------------ */
+h1 {
+  font-family: 'Cinzel Decorative', cursive;
+  font-size: 2.25rem;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  letter-spacing: 1px;
 }
 
+/* ------------------ */
+/* Verse of the Day Styling */
+/* ------------------ */
+#verse-of-the-day {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1rem;
+  color: #fffbe8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ------------------ */
+/* Krishna's Bubble */
+/* ------------------ */
+/* Style for the 📜 citation text */
+.krishna-bubble small {
+  font-size: 0.95rem;
+  color: #111;
+  font-style: italic;
+  display: block;
+  margin-top: 0.4rem;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Style for 🗣️ Read button */
+.speak-btn {
+  font-size: 0.85rem;
+  color: #111;
+  text-decoration: underline;
+  margin-top: 0.3rem;
+  display: inline-block;
+  transition: color 0.2s ease;
+}
+
+.speak-btn:hover {
+  color: #ffffff;
+}
+
+.krishna-bubble {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.0rem !important;
+  /* font-weight: 400 !important; */
+  line-height: 1.5 !important;
+  
+  text-transform: none !important;
+  /* letter-spacing: 0.3px !important; */
+  color: #111;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 0 5px rgba(255, 255, 255, 0.1),
+    0 0 10px rgba(153, 102, 255, 0.15),
+    0 0 20px rgba(153, 102, 255, 0.25);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+
+
+.krishna-bubble:hover {
+  box-shadow:
+    0 0 12px rgba(255, 255, 255, 0.3),
+    0 0 20px rgba(153, 102, 255, 0.5),
+    0 0 30px rgba(153, 102, 255, 0.6);
+}
+
+/* ------------------ */
+/* User's Bubble */
+/* ------------------ */
 .user-bubble {
-  background-color: #fefcbf;
-  color: #333;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #111;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 0 5px rgba(255, 255, 255, 0.1),
+    0 0 10px rgba(153, 102, 255, 0.15),
+    0 0 20px rgba(153, 102, 255, 0.25);
+  transition: box-shadow 0.3s ease-in-out;
 }
