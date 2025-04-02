@@ -129,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(data => {
         const short = summarizeToTwoSentences(data.text);
         verseBanner.innerHTML = `
-          🕉️ <span class="font-semibold text-white">${short}</span><br>
-          <small class="text-gray-300 italic">${data.citation}</small>
+          🕉️ <span class="font-semibold text-black">${short}</span><br>
+          
         `;
         verseBanner.classList.remove('hidden');
       });
