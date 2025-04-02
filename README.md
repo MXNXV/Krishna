@@ -17,12 +17,16 @@ This project creates a web-based chatbot that answers questions as Lord Krishna,
 krishna-chatbot/
 ├── public/                 # Static frontend files
 │   ├── index.html          # Main HTML page
+│   ├── admin.html          # Main admin page
 │   ├── app.js              # Frontend JavaScript
-│   └── styles.css          # CSS styles
+│   └── krishna-theme.css   # CSS styles
+│   ├── krishna.png         # Krishna's pfp
+│   ├── user.png            # User's pfp
+│   ├── vrindavan.jpg       # Vrindavan's background
 ├── data/                   # Default knowledge base
 │   └── bhagavad_gita.json  # Bhagavad Gita verses in JSON format
-├── uploads/                # Folder for user-uploaded text files
 ├── file-processor.js       # Handles parsing and processing text files
+├── llm-helper.js           # Handles api calls with llm
 ├── server.js               # Express backend server
 └── package.json            # Project dependencies
 ```
