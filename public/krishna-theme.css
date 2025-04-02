@@ -1,0 +1,25 @@
+/* Krishna Chatbot - Vrindavan Theme CSS Additions */
+
+/* Typing dots animation */
+.dot-animation::after {
+  content: '.';
+  animation: dots 1.5s steps(3, end) infinite;
+}
+
+@keyframes dots {
+  0% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
+  100% { content: '.'; }
+}
+
+/* Optional bubble styles if not already in your main CSS */
+.krishna-bubble {
+  background: linear-gradient(to right, #6b46c1, #9f7aea);
+  color: white;
+}
+
+.user-bubble {
+  background-color: #fefcbf;
+  color: #333;
+}

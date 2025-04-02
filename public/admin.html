@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Krishna Chatbot Admin - Manage Sacred Texts</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-image: url('/api/placeholder/800/600');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    .admin-container {
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <header class="bg-blue-900 text-white p-4 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl md:text-3xl font-bold">Krishna Chatbot Admin</h1>
+      <a href="/" class="text-white hover:text-yellow-300 transition">Back to Chat</a>
+    </div>
+  </header>
+
+  <main class="flex-grow container mx-auto p-4 flex flex-col">
+    <div class="admin-container rounded-lg shadow-lg p-6 mb-6">
+      <h2 class="text-xl font-bold mb-4">Upload Sacred Text</h2>
+      <form id="upload-form" class="space-y-4">
+        <div>
+          <label for="file-upload" class="block text-sm font-medium text-gray-700">Select File</label>
+          <input type="file" id="file-upload" name="file" accept=".txt,.json,.md"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" />
+          <p class="mt-1 text-sm text-gray-500">Supported formats: .txt, .json, .md</p>
+        </div>
+
+        <div>
+          <label for="source-name" class="block text-sm font-medium text-gray-700">Source Name</label>
+          <input type="text" id="source-name" name="source" placeholder="e.g., bhagavad_gita"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm" />
+          <p class="mt-1 text-sm text-gray-500">Name to identify this text (use snake_case)</p>
+        </div>
+
+        <div>
+          <button type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
+            Upload Text
+          </button>
+        </div>
+      </form>
+
+      <div id="upload-status" class="mt-4 hidden p-3 rounded"></div>
+    </div>
+
+    <div class="admin-container rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-bold mb-4">Uploaded Sacred Texts</h2>
+      <div id="sources-list" class="space-y-2">
+        <p class="text-gray-600 italic">Loading sources...</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-blue-900 text-white p-4 mt-4">
+    <div class="container mx-auto text-center">
+      <p>Krishna Chatbot Admin Panel</p>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const uploadForm = document.getElementById('upload-form');
+      const uploadStatus = document.getElementById('upload-status');
+      const sourcesList = document.getElementById('sources-list');
+
+      fetchSources();
+
+      uploadForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const fileInput = document.getElementById('file-upload');
+        const sourceInput = document.getElementById('source-name');
+
+        if (!fileInput.files.length) {
+          showStatus('Please select a file to upload.', 'error');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        formData.append('source', sourceInput.value || fileInput.files[0].name.split('.')[0]);
+
+        showStatus('Uploading and processing file...', 'loading');
+
+        fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.error) {
+              showStatus('Error: ' + data.error, 'error');
+            } else {
+              showStatus(`✅ Success! Added ${data.entriesCount} verses from ${data.source}`, 'success');
+              uploadForm.reset();
+              fetchSources();
+            }
+          })
+          .catch(err => {
+            showStatus('Error: ' + err.message, 'error');
+          });
+      });
+
+      function showStatus(message, type) {
+        uploadStatus.textContent = message;
+        uploadStatus.className = 'mt-4 p-3 rounded';
+
+        if (type === 'error') {
+          uploadStatus.classList.add('bg-red-100', 'text-red-700');
+        } else if (type === 'success') {
+          uploadStatus.classList.add('bg-green-100', 'text-green-700');
+        } else {
+          uploadStatus.classList.add('bg-blue-100', 'text-blue-700');
+        }
+
+        uploadStatus.classList.remove('hidden');
+      }
+
+      function fetchSources() {
+        fetch('/api/sources')
+          .then(res => res.json())
+          .then(data => {
+            if (!data.sources || data.sources.length === 0) {
+              sourcesList.innerHTML = '<p class="text-gray-600 italic">No sources available.</p>';
+              return;
+            }
+
+            let table = `<table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-2 text-left font-bold">Source ID</th>
+                        <th class="px-4 py-2 text-left font-bold">Display Name</th>
+                        <th class="px-4 py-2 text-left font-bold">Verses</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-100">`;
+
+            data.sources.forEach(source => {
+              table += `
+                    <tr>
+                        <td class="px-4 py-2">${source.id}</td>
+                        <td class="px-4 py-2">${source.name}</td>
+                        <td class="px-4 py-2">${source.entriesCount}</td>
+                    </tr>`;
+            });
+
+            table += `</tbody></table>`;
+            sourcesList.innerHTML = table;
+          });
+      }
+    });
+  </script>
+</body>
+</html>

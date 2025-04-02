@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Krishna Chatbot</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/krishna-theme.css">
+  <style>
+    body {
+      background: url('/vrindavan.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+    .glass {
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.85);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+  <div class="w-full max-w-2xl p-6 rounded-lg shadow-xl glass">
+    <h1 class="text-3xl text-center font-bold text-purple-900 mb-2">🕉️ Ask Krishna</h1>
+    <div id="verse-of-the-day" class="text-center italic text-purple-700 mb-4 hidden"></div>
+    <div class="w-full max-w-5xl px-4 md:px-6 mx-auto mt-8">
+      <div id="chat-box" class="w-full h-96 overflow-y-auto space-y-4 p-4 border border-gray-300 rounded-lg bg-white bg-opacity-80">
+        <!-- Messages appear here -->
+      </div>
+    
+      <div class="mt-4 flex items-center gap-2">
+        <input type="text" id="user-input" placeholder="Ask Lord Krishna..." class="flex-1 p-2 border rounded-lg" />
+        <button id="send-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg">Ask</button>
+      </div>
+    
+      <div class="flex items-center mt-2 gap-2">
+        <input type="checkbox" id="toggle-citation" checked />
+        <label for="toggle-citation">Show citations</label>
+        <button id="clear-chat" class="ml-auto text-red-600 text-sm">Clear Chat</button>
+      </div>
+    </div>
+    
+
+  <script src="app.js"></script>
+</body>
+</html>
