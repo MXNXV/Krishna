@@ -1,4 +1,5 @@
 // Krishna Chatbot - Vrindavan Theme - app.js
+let conversationHistory = [];
 
 document.addEventListener('DOMContentLoaded', () => {
   const chatBox = document.getElementById('chat-box');
@@ -15,7 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   clearChat.addEventListener('click', () => {
     chatBox.innerHTML = '';
+    conversationHistory = [];
   });
+  
 
   fetch('/api/sources')
     .then(res => res.json())
@@ -35,7 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch('/api/query', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question })
+      body: JSON.stringify({
+        question,
+        history: conversationHistory.slice(-4) // last 2 user+Krishna exchanges
+      })
     })
       .then(res => res.json())
       .then(data => {
@@ -46,11 +52,18 @@ document.addEventListener('DOMContentLoaded', () => {
           citation: data.source || '',
           sanskrit: data.sanskrit || ''
         });
-      })
-      .catch(() => {
+    
+        conversationHistory.push({ role: 'user', content: question });
+        conversationHistory.push({ role: 'assistant', content: data.response });
+      }).catch(() => {
         removeTyping();
-        addMessage({ text: 'Sorry, Krishna is silent at the moment.', sender: 'krishna' });
+        addMessage({ 
+          text: 'Hmm… looks like I dropped my flute for a moment. Try again, dear friend 💙', 
+          sender: 'krishna' 
+        });
       });
+      
+    
   }
 
   function addMessage({ text, sender = 'krishna', citation = '', sanskrit = '' }) {
@@ -122,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="flex items-center space-x-2">
         <img src="/krishna.png" class="w-6 h-6 rounded-full" alt="Krishna" />
         <span class="text-sm">Krishna is responding<span class="dot-animation ml-1"></span></span>
+
       </div>
     `;
 
