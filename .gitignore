@@ -7,3 +7,4 @@ venv/
 .venv/
 agent/
 .ipynb_checkpoints/
+data_exploration/
