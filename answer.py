@@ -8,7 +8,6 @@ import logging
 import os
 from typing import Any
 
-from chromadb.errors import ChromaError
 from openai import OpenAI
 
 from config import (
@@ -116,6 +115,9 @@ def answer_question(
     Notes:
         This function returns a structured error payload instead of raising to callers.
     """
+    # Lazy import to avoid importing Chroma at module load time.
+    from chromadb.errors import ChromaError
+
     if not query or not query.strip():
         raise ValueError("Query cannot be empty")
 
