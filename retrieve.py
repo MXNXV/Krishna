@@ -10,8 +10,6 @@ Paths and names come from ``config.py`` (same source as ``build_index.py``).
 from __future__ import annotations
 
 import logging
-import json
-import time
 import sys
 from pathlib import Path
 from typing import Any
@@ -27,32 +25,10 @@ from config import (
 )
 
 logger = logging.getLogger(__name__)
-DEBUG_LOG_PATH = "debug-51ae4c.log"
-DEBUG_SESSION_ID = "51ae4c"
 
 # Lazy-loaded after first use (avoids loading torch/model on ``import retrieve``).
 _model: Any = None
 _collection: Any = None
-
-
-def _debug_log(
-    run_id: str,
-    hypothesis_id: str,
-    location: str,
-    message: str,
-    data: dict[str, Any],
-) -> None:
-    payload = {
-        "sessionId": DEBUG_SESSION_ID,
-        "runId": run_id,
-        "hypothesisId": hypothesis_id,
-        "location": location,
-        "message": message,
-        "data": data,
-        "timestamp": int(time.time() * 1000),
-    }
-    with open(DEBUG_LOG_PATH, "a", encoding="utf-8") as f:
-        f.write(json.dumps(payload, ensure_ascii=True) + "\n")
 
 
 def _get_embedding_model() -> Any:
@@ -83,83 +59,25 @@ def _get_collection(chroma_path: Path | str | None = None) -> Any:
         return _collection
 
     db_dir = Path(chroma_path) if chroma_path is not None else DEFAULT_CHROMA_DIR
-    # region agent log
-    _debug_log(
-        run_id="initial",
-        hypothesis_id="H1",
-        location="retrieve.py:_get_collection:db_dir",
-        message="collection_path_resolved",
-        data={
-            "db_dir": str(db_dir),
-            "db_exists": db_dir.exists(),
-            "db_is_dir": db_dir.is_dir(),
-            "override_path_used": chroma_path is not None,
-        },
-    )
-    # endregion
     if not db_dir.is_dir():
         raise FileNotFoundError(
             f"Chroma data directory not found: {db_dir.resolve()}. Run build_index.py first."
         )
 
-    sqlite_file = db_dir / "chroma.sqlite3"
-    children = sorted([p.name for p in db_dir.iterdir()]) if db_dir.exists() else []
-    # region agent log
-    _debug_log(
-        run_id="initial",
-        hypothesis_id="H2",
-        location="retrieve.py:_get_collection:layout",
-        message="chroma_layout_snapshot",
-        data={
-            "sqlite_exists": sqlite_file.exists(),
-            "sqlite_size": sqlite_file.stat().st_size if sqlite_file.exists() else -1,
-            "children_count": len(children),
-            "children_sample": children[:12],
-        },
-    )
-    # endregion
-
     try:
         client = chromadb.PersistentClient(path=str(db_dir))
     except Exception as e:
-        # region agent log
-        _debug_log(
-            run_id="initial",
-            hypothesis_id="H3",
-            location="retrieve.py:_get_collection:persistent_client",
-            message="persistent_client_init_failed",
-            data={"error_type": type(e).__name__, "error": str(e)},
-        )
-        # endregion
         logger.error("Failed to open Chroma at %s: %s", db_dir, e)
         raise RuntimeError(f"Chroma PersistentClient failed: {db_dir}") from e
 
     try:
         coll = client.get_collection(COLLECTION_NAME)
     except NotFoundError as e:
-        # region agent log
-        _debug_log(
-            run_id="initial",
-            hypothesis_id="H4",
-            location="retrieve.py:_get_collection:get_collection",
-            message="collection_not_found",
-            data={"collection_name": COLLECTION_NAME, "error": str(e)},
-        )
-        # endregion
         logger.error("Collection %r not found in %s", COLLECTION_NAME, db_dir)
         raise FileNotFoundError(
             f"No collection {COLLECTION_NAME!r} in {db_dir}. Run build_index.py first."
         ) from e
     except ChromaError as e:
-        # region agent log
-        _debug_log(
-            run_id="initial",
-            hypothesis_id="H5",
-            location="retrieve.py:_get_collection:get_collection",
-            message="collection_lookup_chroma_error",
-            data={"collection_name": COLLECTION_NAME, "error": str(e)},
-        )
-        # endregion
         logger.error("get_collection failed: %s", e)
         raise
 
