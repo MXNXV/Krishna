@@ -27,6 +27,9 @@ def _get_chapter_boundaries(collection: Any) -> dict[int, tuple[int, int]]:
         verse = meta.get("verse")
         if chapter is None or verse is None:
             continue
+        
+        chapter = int(chapter)
+        verse = int(verse)
 
         if chapter not in boundaries:
             boundaries[chapter] = (verse, verse)
