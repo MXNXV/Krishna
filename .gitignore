@@ -8,4 +8,3 @@ venv/
 agent/
 .ipynb_checkpoints/
 data_exploration/
-test_all_queries.py

@@ -1,9 +1,3 @@
-"""
-Streamlit UI entry point for Bhagavad Gita RAG.
-
-Production-quality interface with history and polish.
-"""
-
 from __future__ import annotations
 
 import logging
@@ -13,8 +7,8 @@ from typing import Any
 
 import streamlit as st
 
-from answer import answer_question
-from config import (
+from src.answer import answer_question
+from src.config import (
     DEFAULT_ANSWER_MODEL,
     DEFAULT_ANSWER_TEMPERATURE,
     DEFAULT_CONTEXT_WINDOW_SIZE,
@@ -23,7 +17,6 @@ from config import (
 
 logger = logging.getLogger(__name__)
 
-# Example queries for quick testing
 EXAMPLE_QUERIES = [
     "What is yoga according to the Gita?",
     "What does Krishna teach about duty?",
@@ -35,7 +28,6 @@ EXAMPLE_QUERIES = [
 
 
 def _render_header() -> None:
-    """Render page header with custom styling."""
     st.set_page_config(
         page_title="Bhagavad Gita AI Assistant",
         page_icon="🕉️",
@@ -142,7 +134,6 @@ def _render_header() -> None:
 
 
 def _render_sidebar() -> tuple[int, int, float, str]:
-    """Render sidebar with settings, history, and info."""
     with st.sidebar:
         st.markdown("### Settings")
 
@@ -241,7 +232,6 @@ def _render_sidebar() -> tuple[int, int, float, str]:
 
 
 def _render_examples() -> None:
-    """Render example queries."""
     st.markdown("### Example Questions")
 
     # Show first 3 as buttons
@@ -256,7 +246,6 @@ def _render_examples() -> None:
                 st.session_state.query_input = example
                 st.rerun()
 
-    # More examples in expander
     with st.expander("More examples"):
         for i, example in enumerate(EXAMPLE_QUERIES[3:], start=3):
             if st.button(example, key=f"example_{i}", use_container_width=True):
@@ -265,7 +254,6 @@ def _render_examples() -> None:
 
 
 def _render_result(result: dict[str, Any], query_time: float, query: str) -> None:
-    """Render answer with enhanced styling."""
     err = result.get("error")
     if err:
         st.error(f"Could not generate answer: {err}")
@@ -287,24 +275,19 @@ def _render_result(result: dict[str, Any], query_time: float, query: str) -> Non
         st.metric("Answer Length", f"{len(answer)} chars")
 
     st.markdown("---")
-
-    # Answer section
     st.markdown("### Answer")
     st.markdown(f'<div class="answer-box">{answer}</div>', unsafe_allow_html=True)
 
-    # Copy button
     col1, col2, col3 = st.columns([1, 1, 2])
     with col1:
         if st.button("Copy Answer", use_container_width=True):
             st.session_state.show_copy = True
 
-    # Show copyable text if button was clicked
     if st.session_state.get("show_copy", False):
         with st.expander("Click to select and copy", expanded=True):
             st.code(answer, language=None)
             st.session_state.show_copy = False
 
-    # Retrieved verses
     st.markdown("### Retrieved Verses")
     if verses:
         verse_html = (
@@ -316,7 +299,6 @@ def _render_result(result: dict[str, Any], query_time: float, query: str) -> Non
     else:
         st.caption("No verses retrieved.")
 
-    # Context details
     with st.expander("View Expanded Context"):
         chunks = result.get("context_chunks", [])
         if not chunks:
@@ -346,11 +328,9 @@ def _render_result(result: dict[str, Any], query_time: float, query: str) -> Non
                 if i < len(chunks):
                     st.markdown("---")
 
-    # Add to history
     if "history" not in st.session_state:
         st.session_state.history = []
 
-    # Avoid duplicates
     if not any(h["query"] == query for h in st.session_state.history):
         st.session_state.history.append(
             {
@@ -363,28 +343,19 @@ def _render_result(result: dict[str, Any], query_time: float, query: str) -> Non
 
 
 def main() -> None:
-    """Main Streamlit app entry point."""
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-    # Render header first
     _render_header()
-
-    # Render sidebar
     k, window_size, temperature, model = _render_sidebar()
-
-    # Example queries
     _render_examples()
 
-    # Keep query text in a dedicated session key so it survives reruns.
     if "query_input" not in st.session_state:
-        st.session_state.query_input = str(st.session_state.get("selected_query", ""))
+        st.session_state.query_input = ""
 
-    # Backward-compat: migrate one-shot selected_query into query_input if present.
     selected = st.session_state.get("selected_query", "")
     if selected:
         st.session_state.query_input = str(selected)
 
-    # Main query input
     st.markdown("### Your Question")
     query = st.text_area(
         "Enter your question",
@@ -394,12 +365,9 @@ def main() -> None:
         key="query_input",
     )
 
-    # Clear the selected query after displaying it
     if "selected_query" in st.session_state:
         del st.session_state.selected_query
 
-    # Submit button
-    # Submit button
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         submit = st.button(
@@ -407,23 +375,18 @@ def main() -> None:
             type="primary",
             use_container_width=True
         )
-    
-    # Only show info/return if submit is NOT clicked AND query is empty
+
     if not submit:
         if query.strip():
-            # Query exists but submit not clicked - just show the interface
             return
         else:
-            # No query and no submit - show helpful message
             st.info("Enter a question above or click an example to get started")
             return
-    
-    # If we get here, submit WAS clicked
+
     if not query.strip():
         st.warning("Please enter a question")
         return
 
-    # Process query
     start_time = time.time()
 
     with st.spinner("Searching verses and generating answer..."):
@@ -442,11 +405,8 @@ def main() -> None:
             return
 
     query_time = time.time() - start_time
-
-    # Render results
     _render_result(result, query_time, query.strip())
 
-    # Footer
     st.markdown(
         """
     <div class="footer">
